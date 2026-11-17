@@ -8,6 +8,11 @@ on:
 permissions:
   contents: read
 
+# A new push to the same branch or pull request cancels the older run that is still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: Lint and type check
@@ -28,8 +33,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        # Every Python version on Linux. macOS runners are scarce on GitHub, so macOS
+        # tests only the oldest and the newest supported Python.
+        os: [ubuntu-latest]
         python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: macos-latest
+            python: "3.10"
+          - os: macos-latest
+            python: "3.14"
     env:
       UV_PYTHON: ${{ matrix.python }}
     steps:

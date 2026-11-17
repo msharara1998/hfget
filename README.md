@@ -199,7 +199,7 @@ Both layouts are the same as `hf download` writes them, so you can mix the two t
 
 ## Platform support
 
-- Tested on Linux and macOS, with Python 3.10 to 3.14.
+- Tested in CI on Linux with Python 3.10 to 3.14, and on macOS with Python 3.10 and 3.14.
 - Windows is not tested yet. The cache layout uses symlinks, which need Developer Mode on
   Windows.
 - The live display is built for terminals that rewrap lines when you resize them, as most
