@@ -4,7 +4,7 @@ All notable changes to this project are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-11-17
 
 First release.
 
@@ -18,3 +18,5 @@ First release.
   lines when the output is not a terminal.
 - Python API: `download`, `plan_download`, `execute_plan`, and progress snapshots through a
   callback.
+
+[0.1.0]: https://github.com/msharara1998/hfget/releases/tag/v0.1.0
