@@ -1,0 +1,118 @@
+[project]
+name = "hfget"
+version = "0.1.0"
+description = "Download Hugging Face models and datasets with curl, continuing partial files where they stopped."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Mohammad Sharara", email = "ms198mohammad@gmail.com" }
+]
+keywords = ["huggingface", "hub", "download", "resume", "curl", "models", "datasets"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Internet :: WWW/HTTP",
+    "Typing :: Typed",
+]
+requires-python = ">=3.10"
+dependencies = [
+    # Upper bound: hfget imports a few huggingface_hub internals
+    # (file_download.repo_folder_name, utils.filter_repo_objects, hf_api.RepoFile).
+    "huggingface-hub>=2.4,<3",
+]
+
+[project.urls]
+Homepage = "https://github.com/mohammadsharara/hfget"
+Repository = "https://github.com/mohammadsharara/hfget"
+Issues = "https://github.com/mohammadsharara/hfget/issues"
+Changelog = "https://github.com/mohammadsharara/hfget/blob/main/CHANGELOG.md"
+
+[project.scripts]
+hfget = "hfget.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.13.9,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# The package folder under src/. If you rename it, change this line and the `hfget` script
+# line above. The code itself uses relative imports.
+module-name = "hfget"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.17.5",
+    "ty>=0.0.105",
+]
+
+[tool.uv]
+required-version = ">=0.13.9"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not network'"
+markers = [
+    "network: downloads real files from the Hugging Face Hub (run with `-m network`)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E", "W",  # pycodestyle
+    "F",       # pyflakes
+    "I",       # import sorting
+    "UP",      # pyupgrade
+    "B",       # bugbear
+    "SIM",     # simplify
+    "PTH",     # prefer pathlib
+    "RUF",     # ruff-specific
+    "D",       # docstrings (PEP 257, Google style)
+    "N",       # PEP 8 naming
+    "ANN",     # type hints on every function (PEP 484)
+    "C90",     # McCabe complexity
+    "PLR09",   # too many arguments, branches, returns or statements
+    "RET",     # clear return statements
+    "C4",      # simpler comprehensions
+    "A",       # no shadowed builtins
+    "ERA",     # no commented-out code
+    "T20",     # no print() in library code
+    "G",       # lazy formatting in logging calls
+    "LOG",     # correct use of the logging module
+    "FBT",     # no positional boolean arguments
+    "PIE",     # misc. lints
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+# The command line module is the only place that prints to stdout.
+"src/*/cli.py" = ["T201"]
+# Tests: plain asserts and short helper functions without full docstrings are fine.
+"tests/**" = ["D", "ANN", "PLR09", "FBT"]
+
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.ty.terminal]
+error-on-warning = true
