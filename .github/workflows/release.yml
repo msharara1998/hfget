@@ -1,6 +1,7 @@
 name: Release
 
-# A pushed tag like v0.1.0 publishes to PyPI.
+# A pushed tag like v0.1.0 publishes to PyPI, then creates the GitHub release with the
+# notes from CHANGELOG.md and the same wheel and sdist.
 # Running the workflow by hand (Actions tab > Release > Run workflow) publishes to TestPyPI.
 # Both uploads use trusted publishing, so no token is stored in this repository.
 on:
@@ -26,6 +27,9 @@ jobs:
             echo "Tag ${GITHUB_REF_NAME} does not match the project version ${version}."
             exit 1
           fi
+      - name: Write the release notes from the changelog
+        if: github.event_name == 'push'
+        run: python3 .github/scripts/release_notes.py "${GITHUB_REF_NAME#v}" > release-notes.md
       - name: Build the sdist and the wheel
         run: uv build
       - name: Smoke test the wheel in a clean environment
@@ -34,6 +38,11 @@ jobs:
         with:
           name: dist
           path: dist/
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: github.event_name == 'push'
+        with:
+          name: release-notes
+          path: release-notes.md
 
   testpypi:
     name: Publish to TestPyPI
@@ -77,3 +86,39 @@ jobs:
         run: >-
           uv publish --trusted-publishing always
           --check-url https://pypi.org/simple/
+
+  github-release:
+    name: Create the GitHub release
+    if: github.event_name == 'push'
+    needs: [build, pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist/
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-notes
+          path: .
+      - name: Create the release with the notes and the package files
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1; then
+            echo "A release for ${GITHUB_REF_NAME} already exists. Nothing to do."
+            exit 0
+          fi
+          prerelease=()
+          if [[ "${version}" =~ (a|b|rc|dev)[0-9]+$ ]]; then
+            prerelease=(--prerelease)
+          fi
+          gh release create "${GITHUB_REF_NAME}" dist/* \
+            --verify-tag \
+            --title "hfget ${version}" \
+            --notes-file release-notes.md \
+            "${prerelease[@]}"
