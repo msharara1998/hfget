@@ -2,8 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/hfget)](https://pypi.org/project/hfget/)
 [![Python versions](https://img.shields.io/pypi/pyversions/hfget)](https://pypi.org/project/hfget/)
-[![License: MIT](https://img.shields.io/pypi/l/hfget)](https://github.com/mohammadsharara/hfget/blob/main/LICENSE)
-[![CI](https://github.com/mohammadsharara/hfget/actions/workflows/ci.yml/badge.svg)](https://github.com/mohammadsharara/hfget/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/pypi/l/hfget)](https://github.com/msharara1998/hfget/blob/main/LICENSE)
+[![CI](https://github.com/msharara1998/hfget/actions/workflows/ci.yml/badge.svg)](https://github.com/msharara1998/hfget/actions/workflows/ci.yml)
 
 Download models and datasets from the Hugging Face Hub, and **continue partial files from
 where they stopped**.
@@ -209,7 +209,7 @@ Both layouts are the same as `hf download` writes them, so you can mix the two t
 ## Development
 
 ```bash
-git clone https://github.com/mohammadsharara/hfget
+git clone https://github.com/msharara1998/hfget
 cd hfget
 uv sync
 uv run ruff format && uv run ruff check && uv run ty check
@@ -219,4 +219,4 @@ uv run pytest -m network    # also downloads a small real file from the Hub
 
 ## License
 
-MIT. See [LICENSE](https://github.com/mohammadsharara/hfget/blob/main/LICENSE).
+MIT. See [LICENSE](https://github.com/msharara1998/hfget/blob/main/LICENSE).

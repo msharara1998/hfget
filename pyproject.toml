@@ -35,10 +35,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/mohammadsharara/hfget"
-Repository = "https://github.com/mohammadsharara/hfget"
-Issues = "https://github.com/mohammadsharara/hfget/issues"
-Changelog = "https://github.com/mohammadsharara/hfget/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/msharara1998/hfget"
+Repository = "https://github.com/msharara1998/hfget"
+Issues = "https://github.com/msharara1998/hfget/issues"
+Changelog = "https://github.com/msharara1998/hfget/blob/main/CHANGELOG.md"
 
 [project.scripts]
 hfget = "hfget.cli:main"
