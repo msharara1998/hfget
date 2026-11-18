@@ -12,20 +12,34 @@ where they stopped**.
 `transformers` and the other Hugging Face tools find them. The difference: when a download is
 interrupted, `hfget` keeps the partial file and continues it, byte for byte.
 
-## Why
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/msharara1998/hfget/main/docs/why-hfget-dark.svg">
+  <img alt="Diagram: a 5.3 GB file stops at 3.8 GB. hf download deletes the partial file, starts again at 0 GB and downloads 9.1 GB in total. hfget keeps the partial file, continues at 3.8 GB, downloads 5.3 GB in total and checks the checksum. While downloading, hfget shows live progress per file and hf download shows tqdm progress bars." src="https://raw.githubusercontent.com/msharara1998/hfget/main/docs/why-hfget-light.svg" width="100%">
+</picture>
 
-`hf download` (huggingface_hub 2.4) deletes a partial file when the download is interrupted.
-Running it again skips the files that finished, but a large file that was half done starts
-again from zero. On a slow or unstable connection, a 5 GB weight file can then take hours more.
+## Why hfget
 
-`hfget` keeps every byte it has received:
+Both tools skip files that already finished. The difference is what happens to a file that stops before the end:
 
-| What happens | What `hfget` does |
-| --- | --- |
-| The network drops, or no data arrives for 60 seconds | Waits and continues by itself. The wait doubles after each failed attempt, up to 60 seconds. |
-| You press Ctrl+C, close the terminal, or the computer restarts | Keeps the partial file. Run the same command again to continue. |
-| More than 10 attempts in a row download nothing new | Stops with a message. Run the download again to continue. |
-| The repo is gated or private, or not found | Stops at once with a message, because retrying will not help. |
+| | `hf download` (huggingface_hub 2.4) | `hfget` |
+| --- | --- | --- |
+| The partial file | Deleted. Each run writes to a new temporary file and removes it when the download fails ([source](https://github.com/huggingface/huggingface_hub/blob/v2.4.0/src/huggingface_hub/file_download.py#L2004-L2046)). | Kept, as `<file>.incomplete`. |
+| The next attempt | Starts that file again at 0 GB. | Continues from the last byte. curl asks the server only for the missing bytes. |
+| Example: a 5.3 GB file stops at 3.8 GB | 9.1 GB downloaded in total | 5.3 GB downloaded in total |
+| Progress display | tqdm progress bars | A live area with one row per file (bar, speed, ETA) and a total row. It redraws cleanly when you resize the terminal. |
+
+On a slow or unstable connection, this can save hours on a large model. `hfget` also:
+
+- **Continues by itself.** When the network drops, or no data arrives for 60 seconds, it
+  waits and continues. The wait doubles after each failed attempt, up to 60 seconds.
+- **Keeps partial files when you stop it.** After Ctrl+C, a closed terminal or a restart, run
+  the same command again to continue.
+- **Stops only when it should.** It stops after 10 attempts in a row bring no new data, and at
+  once when retrying cannot help, for example when a repo is gated, private or not found.
+- **Checks every file.** When a file is complete, its checksum is compared with the one from
+  the Hub. A file that does not match is downloaded again.
+- **Changes nothing else.** Same arguments as `hf download`, same folders and cache, so you can
+  mix both tools. It also has a Python API with a progress callback.
 
 ## Install
 
