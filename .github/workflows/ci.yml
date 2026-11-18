@@ -1,9 +1,16 @@
 name: CI
 
+# Changes to Markdown files or docs/ only (README, changelog, diagrams) do not run CI.
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
   pull_request:
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
 
 permissions:
   contents: read
